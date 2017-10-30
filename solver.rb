@@ -1,4 +1,4 @@
-# require 'gnuplot'
+require 'gnuplot'
 require 'plotly'
 require './array-math'
 
@@ -21,6 +21,7 @@ class ODESimulator
     @num_points = num_points	#set number of points
     @step_size = step_size	#set step size
     generate() 			#generate
+    
   end
 
   #==========
@@ -45,16 +46,14 @@ class ODESimulator
     weighted_sum = Array.new
     @points.each do |point|
       #terms in RK4 summation
+      # puts point.inspect
       k0 = @update_fn.call(*point)
-      puts k0.inspect
       k1 = @update_fn.call(point[0] + k0[0]/2.0, point[1] + h/2.0)
-      puts k1.inspect      
       k2 = @update_fn.call(point[0] + k1[0]/2.0, point[1] + h/2.0)
-      puts k2.inspect      
       k3 = @update_fn.call(point[0] + k2[0], point[1] + h)
-      puts k3.inspect      
       weighted_sum << [(k0[0] + 2*k1[0] + 2*k2[0] + k3[0])/6.0, (k0[1] + 2*k1[1] + 2*k2[1] + k3[1])/6.0]
     end
+    # puts "\n\n"
     return weighted_sum
   end
 
@@ -63,23 +62,43 @@ class ODESimulator
     #sets all points according to rk4 update function
     points_prev = @points
     @points = @points.add(rk4_weight(h))
+    # puts points_prev.inspect
+    # puts @points.inspect
   end
 
   
-  def plot ()
-    #plot all x and y points
+  def plot (step)
+    # plot all x and y points
+
+
+    Gnuplot.open do |gp|
+      Gnuplot::Plot.new(gp) do |plot|
+        plot.xrange @x_lims.to_s
+        plot.yrange @y_lims.to_s
+   
+        plot.title "Points at time %.4f" % step
+        plot.xlabel "x"
+        plot.ylabel "y"
+
+        x = @points.vert(0)
+        y = @points.vert(1)
+
+        plot.data << Gnuplot::DataSet.new( [x,y] ) do |ds|
+          ds.notitle
+        end
+      end
+    end
   end
 
   
   def simulate (h=0.05)
+    plot(0)
     #for each t-steps
     @t_lims.step(@step_size) do |step|
-      #update then plot
-      # print "\n\n\nStep at time %.2f : \n" % step.to_s.ljust(4, "0")
-      # @points.each { |p| puts p.inspect;}
+      #update all the points
       update(h)
-      # plot (maybe only do this 10 times during full run;
-      # not sure of limitations of Plotly API)
+      # plot (maybe only do this 10 times during full run)
+      plot(step)
     end
   end
 
