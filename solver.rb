@@ -11,9 +11,9 @@ class ODESimulator
   attr_accessor :points 	#access list of points
   attr_accessor :step_size 	#accessor for t stepsize
 
-  def initialize (update_fn, step_size=0.01,
-                  x_lims=(-5.0..5.0), y_lims=(-5.0..5.0), t_lims=(0..1),
-                  num_points=20)
+  def initialize (update_fn, step_size: 0.01,
+                  x_lims: (-5.0..5.0), y_lims: (-5.0..5.0), t_lims: (0..1),
+                  num_points: 20)
     @update_fn = update_fn	#set update functions
     @x_lims = x_lims 		#set bounds
     @y_lims = y_lims 		
@@ -73,8 +73,9 @@ class ODESimulator
 
     Gnuplot.open do |gp|
       Gnuplot::Plot.new(gp) do |plot|
-        plot.xrange @x_lims.to_s
-        plot.yrange @y_lims.to_s
+        
+        plot.xrange "[%.2f:%.2f]" % [@x_lims.min, @x_lims.max]
+        plot.yrange "[%.2f:%.2f]" % [@y_lims.min, @y_lims.max]
    
         plot.title "Points at time %.4f" % step
         plot.xlabel "x"
