@@ -1,5 +1,4 @@
 require 'gnuplot'
-require 'plotly'
 require './array-math'
 
 class ODESimulator
