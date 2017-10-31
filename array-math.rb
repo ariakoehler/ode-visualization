@@ -5,14 +5,14 @@ module ArrayMath
   # straightforward addition
   def add (other)
     # add smaller array of size n to first n elements of larger array
-    if(other.class == Array)
+    if(other.is_a?(Array))
       if self.length < other.length
         return self.map.with_index { |p, i| p + other[i]}
       else self.length >= other.length
         return other.map.with_index{ |p, i| p + self[i]}
       end
     # broadcast ints and floats to operate on each element
-    elsif(other.class == Float or other.class == Integer)
+    elsif(other.is_a?(Float) or other.is_a?(Integer))
       return self.map.each { |p| p + other }
     else
       raise "Invalid class to be adding to this array."
@@ -22,14 +22,14 @@ module ArrayMath
   # straightforward subtraction
   def sub (other)
     # add smaller array of size n to first n elements of larger array
-    if(other.class == Array)
+    if(other.is_a?(Array))
       if self.length < other.length
         return self.map.with_index { |p, i| p - other[i]}
       else self.length >= other.length
         return other.map.with_index{ |p, i| p - self[i]}
       end
     # broadcast ints and floats to operate on each element
-    elsif(other.class == Float or other.class == Integer)
+    elsif(other.is_a?(Float) or other.is_a?(Integer))
       return self.map.each { |p| p - other }
     else
       raise "Invalid class to be subtracting from this array."
@@ -39,14 +39,14 @@ module ArrayMath
   # straightforward multiplication  
   def mul (other)
     # add smaller array of size n to first n elements of larger array
-    if(other.class == Array)
+    if(other.is_a?(Array))
       if self.length < other.length
         return self.map.with_index { |p, i| p * other[i]}
       else self.length >= other.length
         return other.map.with_index{ |p, i| p * self[i]}
       end
     # broadcast ints and floats to operate on each element
-    elsif(other.class == Float or other.class == Integer)
+    elsif(other.is_a?(Float) or other.is_a?(Integer))
       return self.map.each { |p| p * other }
     else
       raise "Invalid class to be multiplying to this array."
@@ -55,15 +55,16 @@ module ArrayMath
 
   # straightforward division  
   def div (other)
-    # add smaller array of size n to first n elements of larger array
-    if(other.class == Array)
+    # add smaller array of
+ size n to first n elements of larger array
+    if(other.is_a?(Array))
       if self.length < other.length
         return self.map.with_index { |p, i| p / other[i]}
       else self.length >= other.length
         return other.map.with_index{ |p, i| p / self[i]}
       end
     # broadcast ints and floats to operate on each element
-    elsif(other.class == Float or other.class == Integer)
+    elsif(other.is_a?(Float) or other.is_a?(Integer))
       return self.map.each { |p| p / other }
     else
       raise "Invalid class to be dividing from this array."

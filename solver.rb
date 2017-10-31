@@ -1,5 +1,7 @@
-require 'gnuplot'
+# require 'gnuplot'
+require 'gnuplotrb'
 require './array-math'
+include GnuplotRB
 
 class ODESimulator
 
@@ -19,7 +21,8 @@ class ODESimulator
     @t_lims = t_lims
     @num_points = num_points	#set number of points
     @step_size = step_size	#set step size
-    generate() 			#generate
+    @time_plots = []
+    generate 			#generate
     
   end
 
@@ -28,12 +31,12 @@ class ODESimulator
   #==========
 
   #initialize num_points-many doubles to random values within x&y bounds
-  def generate ()
+  def generate
     #create random number generator
     rng = Random.new
     @points = Array.new
 
-    #num_points times, set to random values
+    #num_points times, make random value in ranges 
     @num_points.times do
       @points << [rng.rand(@x_lims), rng.rand(@y_lims)]
     end
@@ -59,47 +62,36 @@ class ODESimulator
   
   def update (h)
     #sets all points according to rk4 update function
-    points_prev = @points
     @points = @points.add(rk4_weight(h))
-    # puts points_prev.inspect
-    # puts @points.inspect
   end
 
   
-  def plot (step)
+  def animate
     # plot all x and y points
+    trajectories = Animation.new(*@time_plots, xrange: @x_lims , yrange: @y_lims)
+    trajectories.plot({term: 'gif', output: 'ode_animation.gif'})
+  end
 
-
-    Gnuplot.open do |gp|
-      Gnuplot::Plot.new(gp) do |plot|
-        
-        plot.xrange "[%.2f:%.2f]" % [@x_lims.min, @x_lims.max]
-        plot.yrange "[%.2f:%.2f]" % [@y_lims.min, @y_lims.max]
-   
-        plot.title "Points at time %.4f" % step
-        plot.xlabel "x"
-        plot.ylabel "y"
-
-        x = @points.vert(0)
-        y = @points.vert(1)
-
-        plot.data << Gnuplot::DataSet.new( [x,y] ) do |ds|
-          ds.notitle
-        end
-      end
-    end
+  def make_plot (step)
+    points_ds = Dataset.new([@points.vert(0), @points.vert(1)], title: 'time = ' + step.round(3).to_s)
+    state_plot = Plot.new(points_ds, xrange: @x_lims , yrange: @y_lims)
+    # state_plot.plot
+    @time_plots << state_plot
+    # state_plot.show
+    # state_plot.to_png
   end
 
   
   def simulate (h=0.05)
-    plot(0)
+    make_plot(0)
     #for each t-steps
     @t_lims.step(@step_size) do |step|
-      #update all the points
+      # update all the points
       update(h)
-      # plot (maybe only do this 10 times during full run)
-      plot(step)
+      # add plots to the animation
+      make_plot(step)
     end
+    animate
   end
 
 end
